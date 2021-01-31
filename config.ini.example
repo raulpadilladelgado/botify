@@ -1,0 +1,6 @@
+; Spotify developers application credentials
+client_id=your client id
+client_secret=your client secret
+
+; Telegraf bot
+bot_id=your bot id
