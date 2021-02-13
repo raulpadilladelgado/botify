@@ -1,11 +1,10 @@
-var SpotifyWebApi = require('spotify-web-api-node');
-const { Telegraf } = require('telegraf');
-var express = require('express');
-var request = require('request');
+const SpotifyWebApi = require('spotify-web-api-node')
+const express = require('express')
+const request = require('request')
 const fs = require('fs');
-const ini = require('ini');
+const ini = require('ini')
 
-const config = ini.parse(fs.readFileSync('./config.ini', 'utf-8'));
+const config = ini.parse(fs.readFileSync('config.ini', 'utf-8'));
 
 var client_id = config.client_id; // Your client id
 var client_secret = config.client_secret; // Your secret
@@ -44,10 +43,11 @@ app.get('/login', function(req, res) {
     res.redirect(spotifyApi.createAuthorizeURL(scopes, state));
 });
 
+let code = "";
 app.get('/callback', function(req, res) {
     res.sendStatus(200);
     code = req.query.code || null;
-    spotifyApi.authorizationCodeGrant(code).then(
+    spotifyApi.authorizationCodeGrant(spotifyService.code).then(
         function(data) {
             console.log('The token expires in ' + data.body['expires_in']);
             console.log('The access token is ' + data.body['access_token']);
@@ -60,14 +60,6 @@ app.get('/callback', function(req, res) {
             console.log('Something went wrong!', err);
         }
     );
-
-    spotifyApi.getUserPlaylists(config.my_spotify_user)
-        .then(function(data) {
-            console.log('Retrieved playlists', data.body);
-            res.write("hola");
-        },function(err) {
-            console.log('Something went wrong!', err);
-        });
 });
 
 app.get('/refresh_token', function(req, res) {
@@ -92,52 +84,13 @@ app.get('/refresh_token', function(req, res) {
     });
 });
 
+isLogged = () => code !== "";
+
+
 console.log('Listening on 8888');
 app.listen(8888);
 
-var access_token;
-var refresh_token;
-var code;
+module.exports = {
+    isLogged: isLogged()
+}
 
-
-const bot = new Telegraf(config.bot_id);
-
-bot.start((context)=>{
-    context.reply("Hello " + context.from.first_name);
-});
-
-bot.help((context)=>{
-    context.reply("Some commands");
-});
-
-bot.settings((context)=>{
-    context.reply("Some configurations");
-});
-
-bot.command(['sort','Sort','SORT'], (context)=> {
-    if (code == null && access_token == null && refresh_token == null){
-        context.reply("First you need to login to your spotify account");
-    }
-});
-
-bot.hears('computer',context =>{
-   context.reply('Hi computer!');
-});
-
-bot.on('text', context =>{
-   context.reply('Sorry, i can not understand you');
-});
-
-bot.on('sticker', context =>{
-   context.reply('❓');
-});
-
-bot.mention('BotFather', context =>{
-   context.reply('You mentioned someone');
-});
-
-bot.phone('+34 000000000',context=>{
-    context.reply("Telephone number");
-})
-
-bot.launch();
