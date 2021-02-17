@@ -20,8 +20,8 @@ bot.settings((context)=>{
 });
 
 bot.command(['sort','Sort','SORT'], (context)=> {
-    var sortPlaylist = spotifyService.sortPlaylist;
-    console.log(sortPlaylist);
+    let sortPlaylist = spotifyService.sortPlaylist;
+    context.replyWithMarkdown(sortPlaylist);
 });
 
 bot.hears('computer',context =>{
