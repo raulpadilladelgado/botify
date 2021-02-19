@@ -1,15 +1,18 @@
 const spotifyApiHandler = require("./spotifyApiHandler")
 
-let login = () => "Please go to [login page](google.es) to login to your spotify account and grant us permission for" +
-    " access to your music data and then type /sort";
+function login(){
+    return "Please go to http://localhost:8888/login to login to your spotify account and grant us permission for" +
+        " access to your music data and then type /sort";
+}
 
-let sortPlaylistByReleaseDate = () => {
-    if (spotifyApiHandler.isLogged) {
-        return "Playlist has been sorted";
+function sortPlaylistByReleaseDate(){
+    if (spotifyApiHandler.isLogged()) {
+        spotifyApiHandler.sortPlaylist();
+        return "Playlist has been sorted"
     }
     return login();
 }
 
 module.exports = {
-    sortPlaylist: sortPlaylistByReleaseDate()
+    sortPlaylistByReleaseDate
 }

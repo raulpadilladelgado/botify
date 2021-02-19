@@ -47,11 +47,12 @@ let code = "";
 app.get('/callback', function(req, res) {
     res.sendStatus(200);
     code = req.query.code || null;
-    spotifyApi.authorizationCodeGrant(spotifyService.code).then(
+    spotifyApi.authorizationCodeGrant(code).then(
         function(data) {
             console.log('The token expires in ' + data.body['expires_in']);
             console.log('The access token is ' + data.body['access_token']);
             console.log('The refresh token is ' + data.body['refresh_token']);
+            console.log('The code is' + code);
 
             spotifyApi.setAccessToken(data.body['access_token']);
             spotifyApi.setRefreshToken(data.body['refresh_token']);
@@ -84,13 +85,30 @@ app.get('/refresh_token', function(req, res) {
     });
 });
 
-let isLogged = () => code !== "";
+function isLogged(){
+    return code !== "";
+}
+
+function getCode(){
+    return code;
+}
+
+function sortPlaylist(){
+    spotifyApi.getPlaylist('6xhYmH2OOJ62Wjfc8fmA3r')
+        .then(function(data) {
+            console.log('Some information about this playlist', data.body);
+        }, function(err) {
+            console.log('Something went wrong!', err);
+        });
+}
 
 
 console.log('Listening on 8888');
 app.listen(8888);
 
 module.exports = {
-    isLogged: isLogged()
+    isLogged,
+    getCode,
+    sortPlaylist
 }
 

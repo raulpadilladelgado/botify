@@ -20,13 +20,19 @@ bot.settings((context)=>{
 });
 
 bot.command(['sort','Sort','SORT'], (context)=> {
-    let sortPlaylist = spotifyService.sortPlaylist;
+    let sortPlaylist = spotifyService.sortPlaylistByReleaseDate();
     context.replyWithMarkdown(sortPlaylist);
 });
 
-bot.hears('computer',context =>{
-   context.reply('Hi computer!');
-});
+ let spotifyApiHandler = require('./spotifyApiHandler');
+ bot.hears('computer',context =>{
+     let code = spotifyApiHandler.getCode();
+     if (code != ""){
+         context.reply(code);
+     }else{
+         context.reply("prueba otra vez");
+     }
+ });
 
 bot.on('text', context =>{
    context.reply('Sorry, i can not understand you');
