@@ -1,4 +1,4 @@
-const spotifyService = require("./spotifyService")
+const spotifyApi = require("./spotifyApi")
 const { Telegraf } = require('telegraf');
 const ini = require('ini');
 const fs = require('fs');
@@ -15,24 +15,14 @@ bot.help((context)=>{
     context.reply("Some commands");
 });
 
-bot.settings((context)=>{
-    context.reply("Some configurations");
+bot.command(['sort','Sort','SORT'], async (context)=> {
+        console.log("INIT");
+        let result = await spotifyApi.getUserPlaylists();
+    for (let i = 0; i < result.items.length; i++) {
+        context.reply(result.items[i].name + " - " + result.items[i].id);
+    }
+        console.log("END");
 });
-
-bot.command(['sort','Sort','SORT'], (context)=> {
-    let sortPlaylist = spotifyService.sortPlaylistByReleaseDate();
-    context.replyWithMarkdown(sortPlaylist);
-});
-
- let spotifyApiHandler = require('./spotifyApiHandler');
- bot.hears('computer',context =>{
-     let code = spotifyApiHandler.getCode();
-     if (code != ""){
-         context.reply(code);
-     }else{
-         context.reply("prueba otra vez");
-     }
- });
 
 bot.on('text', context =>{
    context.reply('Sorry, i can not understand you');
@@ -41,13 +31,5 @@ bot.on('text', context =>{
 bot.on('sticker', context =>{
    context.reply('❓');
 });
-
-bot.mention('BotFather', context =>{
-   context.reply('You mentioned someone');
-});
-
-bot.phone('+34 000000000',context=>{
-    context.reply("Telephone number");
-})
 
 bot.launch();

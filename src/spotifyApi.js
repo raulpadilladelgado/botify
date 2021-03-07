@@ -1,3 +1,5 @@
+
+
 const SpotifyWebApi = require('spotify-web-api-node')
 const express = require('express')
 const request = require('request')
@@ -89,87 +91,14 @@ function isLogged(){
     return code !== "";
 }
 
-function getCode(){
-    return code;
-}
-
-async function getSnapshotId() {
-    let snapshotId = "";
-    await spotifyApi.getPlaylist('4vIbCu9KRCUsgKzqnYYVbj')
-        .then(function (data) {
-            snapshotId = data.body.snapshot_id;
-        }, function (err) {
-        });
-    return snapshotId
-}
-
-function sortPlaylist() {
-    removeTracks();
-}
-snapshotId.then(value => {
-        spotifyApi.removeTracksFromPlaylistByPosition(
-            '4vIbCu9KRCUsgKzqnYYVbj',
-            [0],
-            value
-        )
-            .then(function (data){
-                console.log("Tracks removed");
-            }),function (err){
-            console.log(err);
-        }
-    });
-function removeTracks(){
-    var snapshotId = getSnapshotId();
-    var playlistLength = getPlaylistLength();
-    playlistLength.then(value => console.log(value));
-    snapshotId.then(value => {
-        spotifyApi.removeTracksFromPlaylistByPosition(
-            '4vIbCu9KRCUsgKzqnYYVbj',
-            [0],
-            value
-        )
-            .then(function (data){
-                console.log("Tracks removed");
-            }),function (err){
-            console.log(err);
-        }
+function getUserPlaylists (){
+    return spotifyApi.getUserPlaylists().then((data)=>{
+        return data.body;
     });
 }
-
-
-async function getPlaylistLength(){
-    var length;
-    await spotifyApi
-        .getPlaylistTracks('4vIbCu9KRCUsgKzqnYYVbj', {
-            fields: 'items'
-        })
-        .then(
-            function(data) {
-                length = data.body.items.length;
-            },
-            function(err) {
-            }
-        );
-    return length;
-}
-
-function getRange(number) {
-    let index = [];
-    for (let i = 0; i < number ; i++) {
-        index.push(i);
-    }
-    return index;
-}
-
-
-
 
 console.log('Listening on 8888');
 app.listen(8888);
 
-module.exports = {
-    isLogged,
-    getCode,
-    sortPlaylist
-}
+module.exports.getUserPlaylists = getUserPlaylists
 
