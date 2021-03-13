@@ -15,21 +15,19 @@ bot.help((context)=>{
     context.reply("Some commands");
 });
 
-bot.command(['sort','Sort','SORT'], async (context)=> {
-        console.log("INIT");
+bot.command(['list','List','LIST'], async (context)=> {
         let result = await spotifyApi.getUserPlaylists();
     for (let i = 0; i < result.items.length; i++) {
         context.reply(result.items[i].name + " - " + result.items[i].id);
     }
-        console.log("END");
 });
 
-bot.on('text', context =>{
-   context.reply('Sorry, i can not understand you');
-});
-
-bot.on('sticker', context =>{
-   context.reply('❓');
+bot.on('text', async (context) => {
+    let message = context.message.text;
+    var result = await spotifyApi.getTracksFromPlaylist(message);
+    for (let i = 0; i < result.items.length; i++) {
+        console.log(result.items[i].track.name + " " + result.items[i].track.uri + " " + result.items[i].track.album.release_date);
+    }
 });
 
 bot.launch();

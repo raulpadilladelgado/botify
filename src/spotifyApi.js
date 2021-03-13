@@ -1,5 +1,3 @@
-
-
 const SpotifyWebApi = require('spotify-web-api-node')
 const express = require('express')
 const request = require('request')
@@ -97,8 +95,20 @@ function getUserPlaylists (){
     });
 }
 
+function getTracksFromPlaylist(playlistId) {
+    return spotifyApi.getPlaylistTracks(playlistId,{
+        offset: 1,
+        limit: 1,
+        fields: 'items'
+    }).then((data)=>{
+        return data.body;
+    });
+
+}
+
 console.log('Listening on 8888');
 app.listen(8888);
 
 module.exports.getUserPlaylists = getUserPlaylists
+module.exports.getTracksFromPlaylist = getTracksFromPlaylist
 
