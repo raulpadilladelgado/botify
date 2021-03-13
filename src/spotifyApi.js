@@ -97,13 +97,45 @@ function getUserPlaylists (){
 
 function getTracksFromPlaylist(playlistId) {
     return spotifyApi.getPlaylistTracks(playlistId,{
-        offset: 1,
-        limit: 1,
+        offset: 0,
         fields: 'items'
     }).then((data)=>{
         return data.body;
     });
+}
 
+function addTracksToPlaylist(playlistId, tracks) {
+    return spotifyApi.addTracksToPlaylist(playlistId, tracks).then((data) => {
+        return data.body;
+    });
+}
+
+async function removeTracksFromPlaylist(playlistId) {
+    var range = getRange(await getPlaylistLength(playlistId));
+    var snapshotId = await getSnapshotId(playlistId);
+    return spotifyApi.removeTracksFromPlaylistByPosition(playlistId, range, snapshotId).then((data)=>{
+        return data.body;
+    });
+}
+
+function getRange(max){
+    let result = [];
+    for (let i = 0; i < max; i++) {
+        result.push(i);
+    }
+    return result;
+}
+
+function getPlaylistLength(playlistId){
+    return spotifyApi.getPlaylist(playlistId).then((data)=>{
+        return data.body.tracks.total;
+    });
+}
+
+function getSnapshotId(playlistId){
+    return spotifyApi.getPlaylist(playlistId).then((data)=>{
+        return data.body.snapshot_id;
+    });
 }
 
 console.log('Listening on 8888');
@@ -111,4 +143,6 @@ app.listen(8888);
 
 module.exports.getUserPlaylists = getUserPlaylists
 module.exports.getTracksFromPlaylist = getTracksFromPlaylist
+module.exports.removeTracksFromPlaylist = removeTracksFromPlaylist
+module.exports.addTracksToPlaylist = addTracksToPlaylist
 
