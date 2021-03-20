@@ -95,15 +95,14 @@ function getUserPlaylists (){
     });
 }
 
-function getTracksFromPlaylist(playlistId) {
+function getTracksFromPlaylist(playlistId, offset) {
     return spotifyApi.getPlaylistTracks(playlistId,{
-        offset: 0,
+        offset: offset,
         fields: 'items'
     }).then((data)=>{
         return data.body;
     });
 }
-
 function addTracksToPlaylist(playlistId, tracks) {
     return spotifyApi.addTracksToPlaylist(playlistId, tracks).then((data) => {
         return data.body;
@@ -145,4 +144,5 @@ module.exports.getUserPlaylists = getUserPlaylists
 module.exports.getTracksFromPlaylist = getTracksFromPlaylist
 module.exports.removeTracksFromPlaylist = removeTracksFromPlaylist
 module.exports.addTracksToPlaylist = addTracksToPlaylist
+module.exports.getPlaylistLength = getPlaylistLength
 

@@ -24,10 +24,13 @@ bot.command(['list','List','LIST'], async (context)=> {
 });
 
 bot.on('text', async (context) => {
-    let message = context.message.text;
-    var result = await spotifyApi.getTracksFromPlaylist(message);
-    var tracks = result.items;
-    tracks.sort(function(a, b) {
+    let playlistId = context.message.text;
+    var playlistLength = await spotifyApi.getPlaylistLength(playlistId);
+    var result = [];
+    for (let i = 0; i < playlistLength; i=i+100) {
+        result = result.concat(await spotifyApi.getTracksFromPlaylist(playlistId,i).then(data=>data.items));
+    }
+    result.sort(function(a, b) {
         var releaseDateA = a.track.album.release_date; // ignore upper and lowercase
         var releaseDateB = b.track.album.release_date; // ignore upper and lowercase
         if (releaseDateA < releaseDateB) {
@@ -39,12 +42,16 @@ bot.on('text', async (context) => {
         return 0;
     });
     let spotifyUris = [];
-    for (let i = 0; i < tracks.length; i++) {
-        console.log(tracks[i].track.name + " " + tracks[i].track.uri + " " + tracks[i].track.album.release_date);
-        spotifyUris.push(tracks[i].track.uri);
+    for (let i = 0; i < result.length; i++) {
+        spotifyUris.push(result[i].track.uri);
     }
-    console.log(await spotifyApi.removeTracksFromPlaylist(message));
-    console.log(await spotifyApi.addTracksToPlaylist(message,spotifyUris));
+    let copyOf = spotifyUris.slice();
+    console.log(copyOf.length);
+    console.log(copyOf);
+    console.log(await spotifyApi.removeTracksFromPlaylist(playlistId));
+    for (let i = 0; i < spotifyUris.length; i = i + 100) {
+        console.log(await spotifyApi.addTracksToPlaylist(playlistId,copyOf.splice(0,100)));
+    }
 });
 
 bot.launch();
