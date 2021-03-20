@@ -162,13 +162,15 @@ function getPlaylistLength(playlistId){
     );
 }
 
-async function sortPlaylistByReleaseDateDesc(playlistId) {
-    var result = await getPlaylistLength(playlistId);
-    if (result.body && result.body.error.message) return result.body.error.message;
+async function getTracks(result, playlistId) {
     var tracks = [];
     for (let i = 0; i < result; i = i + 100) {
         tracks = tracks.concat(await getTracksFromPlaylist(playlistId, i).then(data => data.items));
     }
+    return tracks;
+}
+
+function sortTracks(tracks) {
     tracks.sort(function (a, b) {
         var releaseDateA = a.track.album.release_date; // ignore upper and lowercase
         var releaseDateB = b.track.album.release_date; // ignore upper and lowercase
@@ -180,15 +182,31 @@ async function sortPlaylistByReleaseDateDesc(playlistId) {
         }
         return 0;
     });
+}
+
+function extractSpotifyUris(tracks) {
     let spotifyUris = [];
     for (let i = 0; i < tracks.length; i++) {
         spotifyUris.push(tracks[i].track.uri);
     }
+    return spotifyUris;
+}
+
+async function addTracks(spotifyUris, playlistId) {
     let copyOfSpotifyUris = spotifyUris.slice();
-    await removeTracksFromPlaylist(playlistId);
     for (let i = 0; i < spotifyUris.length; i = i + 100) {
         await addTracksToPlaylist(playlistId, copyOfSpotifyUris.splice(0, 100));
     }
+}
+
+async function sortPlaylistByReleaseDateDesc(playlistId) {
+    var result = await getPlaylistLength(playlistId);
+    if (result.body && result.body.error.message) return result.body.error.message;
+    var tracks = await getTracks(result, playlistId);
+    sortTracks(tracks);
+    let spotifyUris = extractSpotifyUris(tracks);
+    await removeTracksFromPlaylist(playlistId);
+    await addTracks(spotifyUris, playlistId);
 }
 
 function getSnapshotId(playlistId){
@@ -206,9 +224,6 @@ console.log('Listening on 8888');
 app.listen(8888);
 
 module.exports.getUserPlaylists = getUserPlaylists
-module.exports.getTracksFromPlaylist = getTracksFromPlaylist
-module.exports.removeTracksFromPlaylist = removeTracksFromPlaylist
-module.exports.addTracksToPlaylist = addTracksToPlaylist
-module.exports.getPlaylistLength = getPlaylistLength
 module.exports.sortPlaylist = sortPlaylistByReleaseDateDesc
+module.exports.extractSpotifyUris = extractSpotifyUris
 
