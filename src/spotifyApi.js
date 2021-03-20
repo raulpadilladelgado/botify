@@ -89,32 +89,58 @@ function isLogged(){
     return code !== "";
 }
 
-function getUserPlaylists (){
-    return spotifyApi.getUserPlaylists().then((data)=>{
-        return data.body;
-    });
+async function getUserPlaylists() {
+    var result = await spotifyApi.getUserPlaylists().then(
+        (data) => {
+            return data.body;
+        },
+        (error) => {
+            return error;
+        }
+    );
+    if (result.body && result.body.error.message) return result.body.error.message;
+    var playlists = [];
+    for (let i = 0; i < result.items.length; i++) {
+        playlists.push(result.items[i].name + " - " + result.items[i].id);
+    }
+    return playlists.toString().replaceAll(",","\n");
 }
 
 function getTracksFromPlaylist(playlistId, offset) {
     return spotifyApi.getPlaylistTracks(playlistId,{
         offset: offset,
         fields: 'items'
-    }).then((data)=>{
+    }).then(
+        (data) => {
         return data.body;
-    });
+        },
+        (error) => {
+        return error;
+        }
+    );
 }
 function addTracksToPlaylist(playlistId, tracks) {
-    return spotifyApi.addTracksToPlaylist(playlistId, tracks).then((data) => {
+    return spotifyApi.addTracksToPlaylist(playlistId, tracks).then(
+        (data) => {
         return data.body;
-    });
+        },
+        (error) => {
+            return error;
+        }
+    );
 }
 
 async function removeTracksFromPlaylist(playlistId) {
     var range = getRange(await getPlaylistLength(playlistId));
     var snapshotId = await getSnapshotId(playlistId);
-    return spotifyApi.removeTracksFromPlaylistByPosition(playlistId, range, snapshotId).then((data)=>{
+    return spotifyApi.removeTracksFromPlaylistByPosition(playlistId, range, snapshotId).then(
+        (data) => {
         return data.body;
-    });
+        },
+        (error) => {
+            return error;
+        }
+    );
 }
 
 function getRange(max){
@@ -126,15 +152,54 @@ function getRange(max){
 }
 
 function getPlaylistLength(playlistId){
-    return spotifyApi.getPlaylist(playlistId).then((data)=>{
+    return spotifyApi.getPlaylist(playlistId).then(
+        (data) => {
         return data.body.tracks.total;
+        },
+        (error) => {
+        return error;
+        }
+    );
+}
+
+async function sortPlaylistByReleaseDateDesc(playlistId) {
+    var result = await getPlaylistLength(playlistId);
+    if (result.body && result.body.error.message) return result.body.error.message;
+    var tracks = [];
+    for (let i = 0; i < result; i = i + 100) {
+        tracks = tracks.concat(await getTracksFromPlaylist(playlistId, i).then(data => data.items));
+    }
+    tracks.sort(function (a, b) {
+        var releaseDateA = a.track.album.release_date; // ignore upper and lowercase
+        var releaseDateB = b.track.album.release_date; // ignore upper and lowercase
+        if (releaseDateA < releaseDateB) {
+            return 1;
+        }
+        if (releaseDateA > releaseDateB) {
+            return -1;
+        }
+        return 0;
     });
+    let spotifyUris = [];
+    for (let i = 0; i < tracks.length; i++) {
+        spotifyUris.push(tracks[i].track.uri);
+    }
+    let copyOfSpotifyUris = spotifyUris.slice();
+    await removeTracksFromPlaylist(playlistId);
+    for (let i = 0; i < spotifyUris.length; i = i + 100) {
+        await addTracksToPlaylist(playlistId, copyOfSpotifyUris.splice(0, 100));
+    }
 }
 
 function getSnapshotId(playlistId){
-    return spotifyApi.getPlaylist(playlistId).then((data)=>{
+    return spotifyApi.getPlaylist(playlistId).then(
+        (data) => {
         return data.body.snapshot_id;
-    });
+        },
+        (error) => {
+        return error;
+        }
+    );
 }
 
 console.log('Listening on 8888');
@@ -145,4 +210,5 @@ module.exports.getTracksFromPlaylist = getTracksFromPlaylist
 module.exports.removeTracksFromPlaylist = removeTracksFromPlaylist
 module.exports.addTracksToPlaylist = addTracksToPlaylist
 module.exports.getPlaylistLength = getPlaylistLength
+module.exports.sortPlaylist = sortPlaylistByReleaseDateDesc
 
