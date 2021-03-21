@@ -226,4 +226,6 @@ app.listen(8888);
 module.exports.getUserPlaylists = getUserPlaylists
 module.exports.sortPlaylist = sortPlaylistByReleaseDateDesc
 module.exports.extractSpotifyUris = extractSpotifyUris
+module.exports.sortTracks = sortTracks
+module.exports.getRange = getRange
 
