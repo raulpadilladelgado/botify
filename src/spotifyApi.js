@@ -103,7 +103,7 @@ async function getUserPlaylists() {
     for (let i = 0; i < result.items.length; i++) {
         playlists.push(result.items[i].name + " - " + result.items[i].id);
     }
-    return playlists.toString().replaceAll(",","\n");
+    return playlists.toString().replace(/,/g, '\n');
 }
 
 function getTracksFromPlaylist(playlistId, offset) {
