@@ -1,11 +1,9 @@
 const playlistOperation = require("./playlistOperation")
 const { Telegraf } = require('telegraf');
-const ini = require('ini');
-const fs = require('fs');
+require('dotenv').config();
 
-const config = ini.parse(fs.readFileSync('config.ini', 'utf-8'));
 
-const bot = new Telegraf(config.bot_id);
+const bot = new Telegraf(process.env.bot_id);
 
 bot.start((context)=>{
     context.reply("Hello " + context.from.first_name);

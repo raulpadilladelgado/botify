@@ -1,13 +1,11 @@
 const SpotifyWebApi = require('spotify-web-api-node')
 const express = require('express')
 const request = require('request')
-const fs = require('fs');
-const ini = require('ini')
+require('dotenv').config();
 
-const config = ini.parse(fs.readFileSync('config.ini', 'utf-8'));
 
-var client_id = config.client_id; // Your client id
-var client_secret = config.client_secret; // Your secret
+var client_id = process.env.client_id; // Your client id
+var client_secret = process.env.client_secret; // Your secret
 var redirect_uri = 'http://localhost:8888/callback'; // Your redirect uri
 
 var app = express();

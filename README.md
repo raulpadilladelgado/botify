@@ -17,9 +17,9 @@ git@github.com:raulpadilladelgado/botify.git`
 Clone config sample file to project 
 folder by execute this:
 
-`cp config.ini.example config.ini`
+`cp .env.example .env`
 
-Replace sample values in _config.ini_ with your spotify developers app
+Replace sample values in .env with your spotify developers app
 and telegram bot credentials:
 
 `client_id
