@@ -1,4 +1,4 @@
-const spotifyApi = require("./spotifyApi")
+const playlistOperation = require("./playlistOperation")
 const { Telegraf } = require('telegraf');
 const ini = require('ini');
 const fs = require('fs');
@@ -17,13 +17,13 @@ bot.help((context)=>{
 });
 
 bot.command(['list','List','LIST'], async (context)=> {
-        let result = await spotifyApi.getUserPlaylists();
+        let result = await playlistOperation.getUserPlaylists();
         context.reply(result);
 });
 
 bot.on('text', async (context) => {
     let playlistId = context.message.text;
-    await spotifyApi.sortPlaylist(playlistId);
+    await playlistOperation.sortPlaylist(playlistId);
     context.reply("Playlist " + playlistId + " was sorted");
 });
 
