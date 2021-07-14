@@ -6,7 +6,6 @@
   "type": "commonjs",
   "scripts": {
     "test": "jest",
-    "build": "node src/bot.js",
     "dev": "nodemon src/bot.js"
   },
   "keywords": [],
