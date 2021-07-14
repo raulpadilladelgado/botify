@@ -21,8 +21,10 @@ bot.command(['list','List','LIST'], async (context)=> {
 
 bot.on('text', async (context) => {
     let playlistId = context.message.text;
-    await playlistOperation.sortPlaylist(playlistId);
-    context.reply("Playlist " + playlistId + " was sorted");
+    //await playlistOperation.sortPlaylist(playlistId);
+    //context.reply("Playlist " + playlistId + " was sorted");
+    var result = await playlistOperation.findTracksWithSameName(playlistId);
+    context.reply(result);
 });
 
 bot.launch();

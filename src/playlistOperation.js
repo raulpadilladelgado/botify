@@ -68,9 +68,37 @@ async function sortPlaylistByReleaseDateDesc(playlistId) {
     if (result.body && result.body.error.message) return result.body.error.message;
     var tracks = await getTracks(result, playlistId);
     sortTracks(tracks);
+    console.log(tracks[0]);
     let spotifyUris = extractSpotifyUris(tracks);
     await removeTracksFromPlaylist(playlistId);
     await addTracks(spotifyUris, playlistId);
+}
+
+function findDuplicateTrack(tracks) {
+    for (let i = 0; i < tracks.length ; i++) {
+        var position = tracks.indexOf(tracks[i]);
+        if (position !== -1 && i < tracks.length - 1 && tracks.indexOf(tracks[i],position + 1) !== -1){
+            return tracks[i];
+        }
+    }
+    return "no tracks were identical";
+}
+
+function extractTrackNames(tracks) {
+    let trackNames = [];
+    for (let i = 0; i < tracks.length; i++) {
+        trackNames.push(tracks[i].track.name);
+    }
+    return trackNames;
+}
+
+async function findTracksWithSameName(playlistId){
+    var result = await apiResponseHandler.getPlaylistLength(playlistId);
+    if (result.body && result.body.error.message) return result.body.error.message;
+    var tracks = await getTracks(result, playlistId);
+    var trackNames = extractTrackNames(tracks);
+    console.log(trackNames);
+    return findDuplicateTrack(trackNames);
 }
 
 module.exports.getUserPlaylists = getUserPlaylists
@@ -78,3 +106,4 @@ module.exports.sortPlaylist = sortPlaylistByReleaseDateDesc
 module.exports.extractSpotifyUris = extractSpotifyUris
 module.exports.sortTracks = sortTracks
 module.exports.getRange = getRange
+module.exports.findTracksWithSameName = findTracksWithSameName
