@@ -9,15 +9,19 @@ release date desc.
 # Start local environment
 ## Clone project 
 
-`git clone 
-git@github.com:raulpadilladelgado/botify.git`
+```bash
+git clone 
+git@github.com:raulpadilladelgado/botify.git
+```
 
 ## Setup your config file
 
 Clone config sample file to project 
 folder by execute this:
 
-`cp .env.example .env`
+```bash
+cp .env.example .env
+```
 
 Replace sample values in .env with your spotify developers app
 and telegram bot credentials:
@@ -26,11 +30,27 @@ and telegram bot credentials:
 client_secret
 bot_id`
 
+## Check your NodeJS version
+
+To run this project is necessary to have at least v12.0.0
+
+If you need to update it, execute this:
+
+````bash
+sudo npm cache clean -f
+
+sudo npm install -g n
+
+sudo n stable
+````
+
 ## Start server
 
 Start server by execute this:
 
-`npm run dev`
+```bash
+npm run dev
+```
 
 ## Login
 
